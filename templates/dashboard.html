@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Todo App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            <a href="{{ url_for('add_todo') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Todo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white mb-0">Total Todos</h6>
+                        <h2 class="mb-0">{{ total }}</h2>
+                    </div>
+                    <i class="bi bi-list-check fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white mb-0">Completed</h6>
+                        <h2 class="mb-0">{{ completed_count }}</h2>
+                    </div>
+                    <i class="bi bi-check-circle fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-dark mb-0">Pending</h6>
+                        <h2 class="mb-0">{{ pending_count }}</h2>
+                    </div>
+                    <i class="bi bi-clock fs-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Todo List -->
+<div class="card shadow">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Your Todos</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if todos %}
+            <ul class="list-group list-group-flush">
+                {% for todo in todos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-3" 
+                        id="todo-{{ todo.id }}">
+                        <div>
+                            <h6 class="mb-1 {% if todo.completed %}text-muted line-through{% else %}fw-bold{% endif %}">
+                                {{ todo.title }}
+                            </h6>
+                            {% if todo.description %}
+                                <p class="mb-1 text-muted small">{{ todo.description }}</p>
+                            {% endif %}
+                            {% if todo.due_date %}
+                                <small class="text-muted"><i class="bi bi-calendar"></i> Due: {{ todo.due_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <form action="{{ url_for('toggle_todo', todo_id=todo.id) }}" method="POST" 
+                                  id="toggle-form-{{ todo.id }}">
+                                <input type="hidden" name="completed" value="1">
+                                <button type="submit" class="btn btn-sm {% if not todo.completed %}btn-success{% else %}btn-secondary{% endif %}" 
+                                        title="{% if todo.completed %}Mark as pending{% else %}Mark as completed{% endif %}">
+                                    <i class="bi bi-{{ 'check' if todo.completed else 'circle' }}"></i>
+                                </button>
+                            </form>
+                            
+                            <a href="{{ url_for('edit_todo', todo_id=todo.id) }}" class="btn btn-sm btn-outline-primary" 
+                               title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            
+                            <form action="{{ url_for('delete_todo', todo_id=todo.id) }}" method="POST" 
+                                  id="delete-form-{{ todo.id }}"
+                                  onsubmit="return confirm('Are you sure you want to delete this todo?');" 
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="text-center p-4">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <p class="text-muted mt-2">No todos yet. Create one to get started!</p>
+                <a href="{{ url_for('add_todo') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add Your First Todo
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+
+# Environment variables
+.env
+
+# Test/cache directories
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Build/installation artifacts
+dist/
+build/
+*.egg-info/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Log files
+logs/
+*.log
+
+# SQLite databases (if used locally)
+*.db
+*.sqlite
+*.sqlite3
+
+# Existing entries
+.roo
+.venv
+AGENTS.md
+pg_db.yaml
