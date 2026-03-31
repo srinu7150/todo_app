@@ -21,7 +21,6 @@ class RegisterPage(BasePage):
     USERNAME_INPUT = "input[name='username']"
     EMAIL_INPUT = "input[name='email']"
     PASSWORD_INPUT = "input[name='password']"
-    CONFIRM_PASSWORD_INPUT = "input[name='confirm_password']"
     REGISTER_BUTTON = "button[type='submit'], input[type='submit']:has-text('Register')"
     FLASH_MESSAGES = ".alert"
     
@@ -66,25 +65,18 @@ class RegisterPage(BasePage):
         """
         self.fill_input("password", password)
     
-    def fill_confirm_password(self, password: str) -> None:
-        """
-        Fill the confirm password field.
-        
-        Args:
-            password: Password to confirm
-        """
-        self.fill_input("confirm_password", password)
+    # Note: The register form does NOT have a confirm_password field
+    # Only username, email, and password are required
     
     def click_register_button(self) -> None:
         """Click the register button."""
         self.click_button("Register")
     
     def submit_registration(
-        self, 
-        username: str, 
-        email: str, 
-        password: str,
-        confirm_password: str = None
+        self,
+        username: str,
+        email: str,
+        password: str
     ) -> None:
         """
         Fill all fields and click register.
@@ -93,21 +85,16 @@ class RegisterPage(BasePage):
             username: Username to enter
             email: Email address to enter
             password: Password to enter
-            confirm_password: Password to confirm (defaults to password)
         """
-        if confirm_password is None:
-            confirm_password = password
-        
         self.fill_username(username)
         self.fill_email(email)
         self.fill_password(password)
-        self.fill_confirm_password(confirm_password)
         self.click_register_button()
     
-    def wait_for_flash_message(self) -> Locator:
+    def wait_for_flash_message(self, message: str = None) -> Locator:
         """Wait for flash message to appear."""
-        return self.wait_for_flash_message()
+        return super().wait_for_flash_message(message)
     
     def get_flash_message(self) -> str:
         """Get the flash message text."""
-        return self.get_flash_message()
+        return super().get_flash_message()

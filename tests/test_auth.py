@@ -5,15 +5,22 @@ This module contains test cases for user registration, login, and logout functio
 """
 
 import pytest
+import uuid
 from playwright.sync_api import expect
+from tests.pages.login_page import LoginPage
+from tests.pages.register_page import RegisterPage
+from tests.pages.dashboard_page import DashboardPage
 
 
 # Fixtures imported from conftest
+
 @pytest.fixture
-def registered_user(base_url):
-    """Create a registered user for tests."""
-    username = "testuser"
-    email = "test@example.com"
+def registered_user(page, base_url):
+    """Create a registered user for tests with unique credentials."""
+    import uuid
+    # Generate unique username and email to avoid conflicts with other tests
+    username = f"testuser_{uuid.uuid4().hex[:8]}"
+    email = f"test{uuid.uuid4().hex[:8]}@example.com"
     password = "password123"  # At least 8 characters
     
     register_page = RegisterPage(page, base_url)
@@ -28,11 +35,8 @@ def registered_user(base_url):
 
 
 @pytest.fixture
-def logged_in_user(base_url):
+def logged_in_user(page, base_url, registered_user):
     """Create a logged in user for tests."""
-    # First register a user
-    registered_user = registered_user
-    
     login_page = LoginPage(page, base_url)
     login_page.goto_login()
     login_page.submit_login(registered_user["username"], registered_user["password"])
@@ -53,8 +57,8 @@ class TestRegistration:
         register_page.goto_register()
         
         # Fill form with valid data
-        username = "newuser123"
-        email = "newuser@example.com"
+        username = f"newuser_{uuid.uuid4().hex[:6]}"  # Unique username
+        email = f"newuser{uuid.uuid4().hex[:6]}@example.com"  # Unique email
         password = "securepass123"
         
         register_page.fill_username(username)
@@ -65,9 +69,9 @@ class TestRegistration:
         # Wait for flash message
         expect(register_page.wait_for_flash_message()).to_be_visible(timeout=5000)
         
-        # Verify success message
+        # Verify success message - Flask shows "Registration successful" on success
         flash_text = register_page.get_flash_message()
-        assert "Registration" in flash_text or "success" in flash_text.lower()
+        assert "Registration successful" in flash_text, f"Expected 'Registration successful' but got: {flash_text}"
     
     def test_registration_with_short_username(self, page, base_url):
         """Test that registration fails with username shorter than 3 characters."""
@@ -98,12 +102,12 @@ class TestRegistration:
         register_page.fill_password("password123")
         register_page.click_register_button()
         
-        # Wait for flash message
+        # Wait for flash message (Flask returns same page with flash on validation error)
         expect(register_page.wait_for_flash_message()).to_be_visible(timeout=5000)
         
-        # Verify error message
+        # Verify error message - Flask shows "Please enter a valid email address."
         flash_text = register_page.get_flash_message()
-        assert "valid email" in flash_text.lower()
+        assert "valid email" in flash_text.lower(), f"Expected 'valid email' but got: {flash_text}"
     
     def test_registration_with_short_password(self, page, base_url):
         """Test that registration fails with password shorter than 8 characters."""
@@ -216,11 +220,11 @@ class TestLogin:
     
     def test_login_redirects_to_dashboard_when_logged_in(self, page, base_url, logged_in_user):
         """Test that accessing login redirects to dashboard when already logged in."""
-        # Navigate directly to dashboard (should redirect to login)
-        page.goto(f"{base_url}/dashboard")
+        # Navigate to login page (should redirect to dashboard since already logged in)
+        page.goto(f"{base_url}/login")
         
-        # Should have been redirected to login
-        expect(page).to_have_url(f"{base_url}/login")
+        # Should have been redirected to dashboard
+        expect(page).to_have_url(f"{base_url}/dashboard")
     
     def test_login_with_email_as_username(self, page, base_url, registered_user):
         """Test that login works with email as username."""

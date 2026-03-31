@@ -130,10 +130,10 @@ class TodoPage(BasePage):
             self.set_due_date(due_date)
         self.click_submit_button()
     
-    def wait_for_flash_message(self) -> Locator:
+    def wait_for_flash_message(self, message: str = None) -> Locator:
         """Wait for flash message to appear."""
-        return self.wait_for_flash_message()
+        return super().wait_for_flash_message(message)
     
     def get_flash_message(self) -> str:
         """Get the flash message text."""
-        return self.get_flash_message()
+        return super().get_flash_message()

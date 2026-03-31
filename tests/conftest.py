@@ -7,15 +7,14 @@ database cleanup, and page object instances.
 
 import pytest
 from playwright.sync_api import sync_playwright, BrowserContext
-from selenium.webdriver.common.by import By
 
 
 @pytest.fixture(scope="session")
 def browser():
     """Create a browser instance for the test session."""
     with sync_playwright() as p:
-        # Launch browser in headless mode
-        browser = p.chromium.launch(headless=True)
+        # Launch browser in headed mode (visible window)
+        browser = p.chromium.launch(headless=False)
         yield browser
         browser.close()
 
@@ -84,18 +83,30 @@ def cleanup_database():
     """
     import requests
     
-    # Before each test - no cleanup needed before test starts
-    yield
-    
-    # After each test - cleanup if possible
+    # Before each test - clean up all users and todos to ensure isolation
     try:
-        # Try to delete all todos for the test user
+        # Delete all todos first (no auth needed)
         response = requests.post(
             "http://localhost:5000/api/todos",
             json=[],  # Empty array to trigger cleanup
             headers={"Content-Type": "application/json"}
         )
-        # If API doesn't support bulk delete, this is a no-op
+        
+        # Then delete all users (requires admin access or direct DB access)
+        # Since we don't have an admin API, we'll skip user deletion
+        # Tests should use unique usernames/emails to avoid conflicts
     except Exception:
         # Ignore cleanup errors - tests should still pass
+        pass
+    
+    yield
+    
+    # After each test - optional cleanup
+    try:
+        response = requests.post(
+            "http://localhost:5000/api/todos",
+            json=[],
+            headers={"Content-Type": "application/json"}
+        )
+    except Exception:
         pass

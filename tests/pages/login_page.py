@@ -72,13 +72,13 @@ class LoginPage(BasePage):
         self.fill_password(password)
         self.click_login_button()
     
-    def wait_for_flash_message(self) -> Locator:
+    def wait_for_flash_message(self, message: str = None) -> Locator:
         """Wait for flash message to appear."""
-        return self.wait_for_flash_message()
+        return super().wait_for_flash_message(message)
     
     def get_flash_message(self) -> str:
         """Get the flash message text."""
-        return self.get_flash_message()
+        return super().get_flash_message()
     
     def navigate_to_register(self) -> None:
         """Navigate to the register page."""

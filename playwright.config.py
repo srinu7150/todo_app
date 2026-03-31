@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 config: Dict[str, Any] = {
-    # Run tests in headless mode by default (can be overridden with --headed)
-    "headless": True,
+    # Run tests in headed mode for debugging
+    "headless": False,
     
     # Base URL for the Flask app
     "base_url": "http://localhost:5000",

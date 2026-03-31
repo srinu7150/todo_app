@@ -102,3 +102,11 @@ class DashboardPage(BasePage):
         """
         links = self._get_locator(self.NAVIGATION_LINKS).all()
         return [link.inner_text().strip() for link in links]
+    
+    def wait_for_flash_message(self, message: str = None) -> Locator:
+        """Wait for flash message to appear."""
+        return super().wait_for_flash_message(message)
+    
+    def get_flash_message(self) -> str:
+        """Get the flash message text."""
+        return super().get_flash_message()
