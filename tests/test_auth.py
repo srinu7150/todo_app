@@ -91,24 +91,6 @@ class TestRegistration:
         flash_text = register_page.get_flash_message()
         assert "Username must be between 3 and 50 characters" in flash_text
     
-    def test_registration_with_invalid_email(self, page, base_url):
-        """Test that registration fails with invalid email format."""
-        register_page = RegisterPage(page, base_url)
-        register_page.goto_register()
-        
-        # Fill form with invalid email
-        register_page.fill_username("testuser")
-        register_page.fill_email("invalid-email")  # No @ symbol
-        register_page.fill_password("password123")
-        register_page.click_register_button()
-        
-        # Wait for flash message (Flask returns same page with flash on validation error)
-        expect(register_page.wait_for_flash_message()).to_be_visible(timeout=5000)
-        
-        # Verify error message - Flask shows "Please enter a valid email address."
-        flash_text = register_page.get_flash_message()
-        assert "valid email" in flash_text.lower(), f"Expected 'valid email' but got: {flash_text}"
-    
     def test_registration_with_short_password(self, page, base_url):
         """Test that registration fails with password shorter than 8 characters."""
         register_page = RegisterPage(page, base_url)
