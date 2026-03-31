@@ -13,8 +13,8 @@ from playwright.sync_api import sync_playwright, BrowserContext
 def browser():
     """Create a browser instance for the test session."""
     with sync_playwright() as p:
-        # Launch browser in headed mode (visible window)
-        browser = p.chromium.launch(headless=False)
+        # Launch browser in headless mode (no visible window)
+        browser = p.chromium.launch(headless=True)
         yield browser
         browser.close()
 

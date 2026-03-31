@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 config: Dict[str, Any] = {
-    # Run tests in headed mode for debugging
-    "headless": False,
+    # Run tests in headless mode (no visible browser)
+    "headless": True,
     
     # Base URL for the Flask app
     "base_url": "http://localhost:5000",
@@ -57,19 +57,22 @@ config: Dict[str, Any] = {
             "name": "chromium",
             "use": {
                 "browserName": "chromium",
-                "channel": "chrome-stable"  # Use Chrome for better compatibility
+                "channel": "chrome-stable",  # Use Chrome for better compatibility
+                "headless": True  # Ensure headless mode for all projects
             }
         },
         {
             "name": "firefox",
             "use": {
-                "browserName": "firefox"
+                "browserName": "firefox",
+                "headless": True  # Ensure headless mode for all projects
             }
         },
         {
             "name": "webkit",
             "use": {
-                "browserName": "webkit"
+                "browserName": "webkit",
+                "headless": True  # Ensure headless mode for all projects
             }
         }
     ],
