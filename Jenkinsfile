@@ -16,6 +16,7 @@ pipeline {
                 script {
                     deleteDir()
                     checkout scm
+                    sh "lks -ltrh"
                 }
             }
         }
