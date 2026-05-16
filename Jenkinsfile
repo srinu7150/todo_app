@@ -22,31 +22,22 @@ pipeline {
     }
 }
 post {
-    failure {
-        script {
-            def log = currentBuild.rawBuild.getLog(300).join('\n')
+  failure {
+    sh '''
+      LOG=$(cat /tmp/build.log | tail -300)
 
-            def payload = groovy.json.JsonOutput.toJson([
-                model: "qwen3.5-9b",
-                messages: [[
-                    role: "user",
-                    content: "Summarize this Jenkins build failure in 5 bullets:\n${log}"
-                ]],
-                max_tokens: 400
-            ])
+      SUMMARY=$(curl -s http://192.168.1.6/v1/chat/completions \
+        -H "Content-Type: application/json" \
+        -d "{
+          \"model\": \"qwen3.5-9b\",
+          \"messages\": [{
+            \"role\": \"user\",
+            \"content\": \"Summarize this Jenkins error log in 5 bullets:\\n${LOG}\"
+          }],
+          \"max_tokens\": 400
+        }" | jq -r '.choices[0].message.content')
 
-            def response = httpRequest(
-                url: 'http://192.168.1.6:1234/v1/chat/completions',
-                httpMode: 'POST',
-                contentType: 'APPLICATION_JSON',
-                requestBody: payload,
-                timeout: 60
-            )
-
-            def json = readJSON text: response.content
-            def summary = json.choices[0].message.content
-
-            slackSend message: "*Build Failed* — ${env.JOB_NAME} #${env.BUILD_NUMBER}\n${summary}"
-        }
-    }
+      echo "$SUMMARY"
+    '''
+  }
 }
